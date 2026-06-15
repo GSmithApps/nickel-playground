@@ -1,0 +1,15 @@
+{
+  "name": "Nickel Sandbox",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "OpenAI.chatgpt",
+        "Tweag.vscode-nickel"
+      ]
+    }
+  },
+  "postCreateCommand": "nickel --version && nls --version"
+}
