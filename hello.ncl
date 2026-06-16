@@ -1,1 +1,4 @@
-25 * 25
+[
+"yeah this is a good calculator!",
+1 * 5
+]

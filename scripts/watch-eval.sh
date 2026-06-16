@@ -9,7 +9,7 @@ Usage:
 Examples:
   scripts/watch-eval.sh hello.ncl
   scripts/watch-eval.sh hello.ncl hello.evaluated.ncl
-  NICKEL_WATCH_INTERVAL=0.25 scripts/watch-eval.sh hello.ncl hello.evaluated.ncl
+  NICKEL_WATCH_INTERVAL=0.25 scripts/watch-eval.sh hello.ncl
 USAGE
 }
 
@@ -20,7 +20,7 @@ fi
 
 input=$1
 output=${2:-"${input%.ncl}.evaluated.ncl"}
-interval=${NICKEL_WATCH_INTERVAL:-1}
+interval=${NICKEL_WATCH_INTERVAL:-0.1}
 
 if ! command -v nickel >/dev/null 2>&1; then
   echo "error: nickel CLI was not found on PATH" >&2
@@ -40,19 +40,20 @@ if [[ "$input_abs" == "$output_abs" ]]; then
   exit 64
 fi
 
-mkdir -p "$(dirname "$output")"
+mkdir -p "$(dirname "$output_abs")"
 
 checksum() {
-  sha256sum "$input" | awk '{ print $1 }'
+  sha256sum "$input_abs" | awk '{ print $1 }'
 }
 
 evaluate() {
   local tmp
-  tmp=$(mktemp "${output}.tmp.XXXXXX")
 
-  if nickel eval "$input" >"$tmp"; then
+  tmp=$(mktemp "${output_abs}.tmp.XXXXXX")
+
+  if nickel eval "$input_abs" >"$tmp"; then
     chmod 0644 "$tmp"
-    mv "$tmp" "$output"
+    mv "$tmp" "$output_abs"
     printf '[%s] updated %s\n' "$(date +%H:%M:%S)" "$output"
   else
     rm -f "$tmp"
@@ -60,24 +61,32 @@ evaluate() {
   fi
 }
 
-last_checksum=
+evaluate_if_changed() {
+  local current_checksum
 
-printf 'Watching %s -> %s\n' "$input" "$output"
-printf 'Press Ctrl-C to stop.\n'
-
-while true; do
-  if [[ ! -f "$input" ]]; then
+  if [[ ! -f "$input_abs" ]]; then
     printf '[%s] waiting for %s to exist again\n' "$(date +%H:%M:%S)" "$input" >&2
-    sleep "$interval"
-    continue
+    return
   fi
 
   current_checksum=$(checksum)
 
-  if [[ "$current_checksum" != "$last_checksum" ]]; then
-    last_checksum=$current_checksum
-    evaluate
+  if [[ "$current_checksum" == "$last_checksum" ]]; then
+    return
   fi
+
+  last_checksum=$current_checksum
+  evaluate
+}
+
+printf 'Watching %s -> %s\n' "$input" "$output"
+printf 'Checking for saved changes every %ss.\n' "$interval"
+printf 'Press Ctrl-C to stop.\n'
+
+last_checksum=
+
+while true; do
+  evaluate_if_changed
 
   sleep "$interval"
 done

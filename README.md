@@ -18,9 +18,18 @@ Run a watcher that updates an evaluated Nickel file whenever the source changes:
 scripts/watch-eval.sh hello.ncl hello.evaluated.ncl
 ```
 
-The watcher evaluates once immediately, then checks for changes every second. It writes through a temporary file, so `hello.evaluated.ncl` is only replaced after a successful `nickel eval`.
+The watcher evaluates once immediately, then checks for saved changes every 0.1 seconds. It writes through a temporary file, so `hello.evaluated.ncl` is only replaced after a successful `nickel eval`.
 
-To check more often, set `NICKEL_WATCH_INTERVAL`:
+If you are timing from an editor change, make sure the file is being saved immediately. VS Code auto-save delays are included in that stopwatch time because the watcher only sees changes after they hit disk. For a snappier loop, enable Auto Save and lower the delay:
+
+```json
+{
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 100
+}
+```
+
+To check more or less often, set `NICKEL_WATCH_INTERVAL`:
 
 ```sh
 NICKEL_WATCH_INTERVAL=0.25 scripts/watch-eval.sh hello.ncl hello.evaluated.ncl
