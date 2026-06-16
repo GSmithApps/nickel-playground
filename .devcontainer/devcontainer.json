@@ -6,7 +6,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "OpenAI.chatgpt",
+        "openai.chatgpt",
         "Tweag.vscode-nickel"
       ]
     }
