@@ -34,3 +34,11 @@ To check more or less often, set `NICKEL_WATCH_INTERVAL`:
 ```sh
 NICKEL_WATCH_INTERVAL=0.25 scripts/watch-eval.sh source.ncl output.ncl
 ```
+
+## To use scratch while not tracking in Git
+
+Make a `scratch/source.ncl` file, then run:
+
+```sh
+scripts/watch-eval.sh scratch/source.ncl scratch/output.ncl
+```
