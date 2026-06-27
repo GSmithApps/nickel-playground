@@ -42,3 +42,8 @@ Make a `scratch/source.ncl` file, then run:
 ```sh
 scripts/watch-eval.sh scratch/source.ncl scratch/output.ncl
 ```
+
+When this repository is opened in the VS Code dev container, that scratch watcher
+starts automatically via `.devcontainer/devcontainer.json`. Its output is written
+to `/tmp/nickel-scratch-watch.log`, and a lock file prevents duplicate watcher
+processes if VS Code attaches more than once.

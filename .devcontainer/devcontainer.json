@@ -11,5 +11,6 @@
       ]
     }
   },
-  "postCreateCommand": "nickel --version && nls --version"
+  "postCreateCommand": "nickel --version && nls --version",
+  "postAttachCommand": "cd /workspaces/nickel-playground && setsid -f flock -n /tmp/nickel-scratch-watch.lock ./scripts/watch-eval.sh scratch/source.ncl scratch/output.ncl >>/tmp/nickel-scratch-watch.log 2>&1"
 }
